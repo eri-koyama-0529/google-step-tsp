@@ -66,7 +66,7 @@ def two_opt(cities): #入力：(元のindex, [x,y])で回る順に格納され�
             # 入れ替えた後の距離
             after = calurate_euclidean_distance(cities[i][1], cities[j][1]) + calurate_euclidean_distance(cities[i+1][1], cities[j+1][1])
 
-            if before < after: #入れ替えたほうが距離が短くなる時
+            if before > after: #入れ替えたほうが距離が短くなる時
             #i+1番目からj番目までの間のノードを逆順にする必要がある
                 start, goal = i+1, j
                 cities[start:goal+1] = cities[goal:start-1:-1]
