@@ -1,19 +1,19 @@
 #================================
 # TSPを貪欲法+2optで実装したコード
-# python3 greedy.py input_0.csv
+# python3 greedy.py input_0.csv > output_0.csv
 #================================
 
 import sys
 import math
 
-from common import print_tour, read_input
+from common import print_tour, read_input, format_tour
 
-# citiesの各位置情報にインデックスを付与する関数
-def give_index_cities(cities):
-    index_cities = [] # 各要素：(index, [x,y])
-    for i in range(len(cities)):
-        index_cities.append((i, cities[i]))
-    return index_cities
+# # citiesの各位置情報にインデックスを付与する関数
+# def give_index_cities(cities):
+#     index_cities = [] # 各要素：(index, [x,y])
+#     for i in range(len(cities)):
+#         index_cities.append((i, cities[i]))
+#     return index_cities
 
 
 # 2点間のユーグリッド距離を求める関数
@@ -37,16 +37,11 @@ def calcurate_distance(cities):
 def greedy(cities):
     # Build a trivial solution.
     # Visit the cities in the order they appear in the input.
-    print("入力確認")
-    print(cities)
-    # print("情報確認")
     dist = calcurate_distance(cities) # 都市間のユーグリッド距離を求める
-    # print(dist) OK
     # index_cities = give_index_cities(cities) #都市の位置とインデックスを対応付ける
-    # print(index_cities)
     current_city = 0 #スタートを設定
     unvisited = set(range(1, len(cities))) # 訪れていない都市のインデックスを格納
-    path = [] # どのような経路で回るか格納（インデックスを格納する）
+    path = [0] # どのような経路で回るか格納（インデックスを格納する）
 
     while unvisited:
         next_city = min(unvisited, key=lambda city: dist[current_city][city])
@@ -59,4 +54,11 @@ def greedy(cities):
 if __name__ == '__main__':
     assert len(sys.argv) > 1
     tour = greedy(read_input(sys.argv[1]))
-    print_tour(tour)
+    # print_tour(tour)
+
+    #csvファイルに出力する
+    output_filename = sys.argv[1].replace("input", "output")
+
+    with open(output_filename, "w") as f:
+        f.write(format_tour(tour))
+    print("Done")
