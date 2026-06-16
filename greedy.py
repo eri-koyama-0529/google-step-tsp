@@ -47,6 +47,7 @@ def greedy(cities):
         next_city = min(unvisited, key=lambda city: dist[current_city][city])
         unvisited.remove(next_city)
         path.append(next_city)
+        current_city = next_city
 
     return path
 
