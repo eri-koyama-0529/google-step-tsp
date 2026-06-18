@@ -71,23 +71,34 @@ def two_opt(cities): #入力：(元のindex, [x,y])で回る順に格納され�
                 start, goal = i+1, j
                 cities[start:goal+1] = cities[goal:start-1:-1]
                 
-        path = []          
-        for c in cities:
-            path.append(c[0])
+        # path = []          
+        # for c in cities:
+        #     path.append(c[0])
     
+    return cities
+
+def solve_tsp(cities):
+    optimized_cities = greedy(cities)
+    # 2optを三回繰り返すことで交差する点を減らす
+    for _ in range(3):
+        optimized_cities = two_opt(optimized_cities)
+
+        path = []          
+        for c in optimized_cities:
+            path.append(c[0])
     return path
-
-
+    
 
 if __name__ == '__main__':
     assert len(sys.argv) > 1
-    tour = greedy(read_input(sys.argv[1])) #貪欲法でけいろをもとめる
-    optimized_tour = two_opt(tour) #2-optで最適化する
+    # tour = greedy(read_input(sys.argv[1])) #貪欲法でけいろをもとめる
+    # optimized_tour = two_opt(tour) #2-optで最適化する
+    tour = solve_tsp(read_input(sys.argv[1]))
     # print_tour(tour)
 
     #csvファイルに出力する
     output_filename = sys.argv[1].replace("input", "output")
 
     with open(output_filename, "w") as f:
-        f.write(format_tour(optimized_tour))
+        f.write(format_tour(tour))
     print("Done")
