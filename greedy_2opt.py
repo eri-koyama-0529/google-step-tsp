@@ -80,7 +80,7 @@ def two_opt(cities): #入力：(元のindex, [x,y])で回る順に格納され�
 def solve_tsp(cities):
     optimized_cities = greedy(cities)
     # 2optを三回繰り返すことで交差する点を減らす
-    for _ in range(3):
+    for _ in range(5):
         optimized_cities = two_opt(optimized_cities)
 
         path = []          
