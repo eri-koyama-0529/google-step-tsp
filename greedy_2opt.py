@@ -1,6 +1,6 @@
 #================================
 # TSPを貪欲法+2optで実装したコード
-# python3 greedy.py input_0.csv > output_0.csv
+# python3 greedy.py input_0.csv 
 #================================
 
 from operator import index
@@ -54,7 +54,6 @@ def greedy(cities):
     return path
 
 def two_opt(cities): #入力：(元のindex, [x,y])で回る順に格納されている
-    # path = [cities[0][0]] # この関数から導いた経路
     len_cities = len(cities)
 
     for i in range(len_cities-1):
@@ -70,16 +69,13 @@ def two_opt(cities): #入力：(元のindex, [x,y])で回る順に格納され�
             #i+1番目からj番目までの間のノードを逆順にする必要がある
                 start, goal = i+1, j
                 cities[start:goal+1] = cities[goal:start-1:-1]
-                
-        # path = []          
-        # for c in cities:
-        #     path.append(c[0])
     
     return cities
 
 def solve_tsp(cities):
+    # まず貪欲法で経路を出す
     optimized_cities = greedy(cities)
-    # 2optを三回繰り返すことで交差する点を減らす
+    # その後、2optを繰り返す
     for _ in range(5):
         optimized_cities = two_opt(optimized_cities)
 
@@ -91,10 +87,7 @@ def solve_tsp(cities):
 
 if __name__ == '__main__':
     assert len(sys.argv) > 1
-    # tour = greedy(read_input(sys.argv[1])) #貪欲法でけいろをもとめる
-    # optimized_tour = two_opt(tour) #2-optで最適化する
     tour = solve_tsp(read_input(sys.argv[1]))
-    # print_tour(tour)
 
     #csvファイルに出力する
     output_filename = sys.argv[1].replace("input", "output")
