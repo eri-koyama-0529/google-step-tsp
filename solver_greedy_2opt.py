@@ -1,5 +1,5 @@
 #================================
-# TSPを貪欲法+2optで実装したコード
+# TSPを貪欲法+2optで実装したコード（閉路対応・改善ループ版）
 # python3 greedy.py input_0.csv 
 #================================
 
@@ -51,37 +51,68 @@ def greedy(cities):
         path.append(index_cities[next_city])
         current_city = next_city
 
-    return path
+    return path, dist # 2-optでも使い回すために距離行列(dist)も返す
 
-def two_opt(cities): #入力：(元のindex, [x,y])で回る順に格納されている
+def two_opt(cities, dist_matrix): # 入力に距離行列を追加
     len_cities = len(cities)
+    improved = True
 
-    for i in range(len_cities-1):
-        for j in range(i+1, len_cities-1):
-            if (i == cities[j+1][0]) | (j == cities[i+1][0]):
-                continue
-            # 入れ替える前の距離
-            before = calurate_euclidean_distance(cities[i][1], cities[i+1][1]) + calurate_euclidean_distance(cities[j][1], cities[j+1][1])
-            # 入れ替えた後の距離
-            after = calurate_euclidean_distance(cities[i][1], cities[j][1]) + calurate_euclidean_distance(cities[i+1][1], cities[j+1][1])
+    # 改善が完全になくなるまで（1周してもどこも入れ替わらなくなるまで）ループ
+    while improved:
+        improved = False
+        
+        for i in range(len_cities):
+            # 閉路（末尾から先頭への繋がり）を考慮するため、jの範囲を末尾まで広げる
+            for j in range(i + 2, len_cities + (1 if i > 0 else 0)):
+                
+                idx_i = i
+                idx_i_next = (i + 1) % len_cities
+                idx_j = j % len_cities
+                idx_j_next = (j + 1) % len_cities
+                
+                # 元の都市インデックスを取得
+                city_a = cities[idx_i][0]
+                city_b = cities[idx_i_next][0]
+                city_c = cities[idx_j][0]
+                city_d = cities[idx_j_next][0]
 
-            if before > after: #入れ替えたほうが距離が短くなる時
-            #i+1番目からj番目までの間のノードを逆順にする必要がある
-                start, goal = i+1, j
-                cities[start:goal+1] = cities[goal:start-1:-1]
+                # 事前に計算した距離行列から距離を取得（計算の高速化）
+                before = dist_matrix[city_a][city_b] + dist_matrix[city_c][city_d]
+                after = dist_matrix[city_a][city_c] + dist_matrix[city_b][city_d]
+
+                if before > after: # 入れ替えたほうが距離が短くなる時
+                    # idx_i_next から idx_j までの要素を反転させる
+                    start = i + 1
+                    end = j
+                    while start < end:
+                        cities[start % len_cities], cities[end % len_cities] = cities[end % len_cities], cities[start % len_cities]
+                        start += 1
+                        end -= 1
+                    
+                    improved = True # 改善があったフラグを立てる
     
     return cities
 
 def solve_tsp(cities):
-    # まず貪欲法で経路を出す
-    optimized_cities = greedy(cities)
-    # その後、2optを繰り返す
-    for _ in range(5):
-        optimized_cities = two_opt(optimized_cities)
+    # まず貪欲法で経路を出す（距離行列も一緒に受け取る）
+    optimized_cities, dist_matrix = greedy(cities)
+    
+    # 改善がなくなるまで徹底的に2optを回す（引数に距離行列を渡す）
+    optimized_cities = two_opt(optimized_cities, dist_matrix)
 
-        path = []          
-        for c in optimized_cities:
-            path.append(c[0])
+    path = []          
+    for c in optimized_cities:
+        path.append(c[0])
+
+    total_dist = 0
+    num_cities = len(path)
+    for i in range(num_cities):
+        city_current = path[i]
+        city_next = path[(i + 1) % num_cities] # % を使うことで、最後は自動的に0番目に戻る
+        total_dist += dist_matrix[city_current][city_next]
+    
+    print(f"Total Distance: {total_dist:.2f}") # 小数点2桁まで画面に出力
+
     return path
     
 
