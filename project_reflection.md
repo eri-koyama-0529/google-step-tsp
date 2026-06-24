@@ -11,6 +11,7 @@
 - solver_annealing_c++.cpp
 - solver_multi_annealing_c++.cpp
 - solver_christofides.py
+- (※solver_3opt.cppは現状のコードではうまく動作しません)
 
 # TSP Solver 実行結果比較
 
